@@ -2,21 +2,19 @@
 
 React + TypeScript frontend with an interactive 3D globe for exploring NASA meteorite landings.
 
+**Node.js 22.13.0** required (`package.json`, `.nvmrc`). Use [nvm](https://github.com/nvm-sh/nvm) to switch versions if your system Node differs — `nvm use` in this directory reads `.nvmrc`.
+
 ## Setup
 
-Node is pinned to **22.13.0** in `package.json` and `.nvmrc`. If your system Node differs, nvm/fnm is optional:
-
 ```bash
-# nvm — install once if you don't have this version yet
+# nvm — first time only
 nvm install 22.13.0
 
 cd frontend
-nvm use          # fnm: fnm use
+nvm use
 node -v          # v22.13.0
 npm install
 ```
-
-Wrong Node version → `npm install` errors (`engine-strict` in `.npmrc`).
 
 ## Development
 
@@ -29,7 +27,7 @@ uvicorn app.main:app --reload
 Then run the frontend:
 
 ```bash
-nvm use          # or: fnm use
+nvm use          # if using nvm
 npm run dev
 ```
 
