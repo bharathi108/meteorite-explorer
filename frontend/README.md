@@ -4,7 +4,7 @@ React + TypeScript frontend with an interactive 3D globe for exploring NASA mete
 
 ## Setup
 
-**Node.js 20.19+ or 22.12+** required (Vite 8). Check with `node -v`.
+**Node.js 22.12.0** required — pinned in `package.json` (`engines.node`). With nvm/fnm: `nvm use` or `fnm use` in this directory (reads `.node-version`). Wrong version fails at `npm install` via `engine-strict`.
 
 ```bash
 cd frontend
