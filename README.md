@@ -14,6 +14,8 @@ Interactive educational app for exploring NASA's Meteorite Landings dataset with
 
 ## First-Time Setup
 
+**Requirements:** Python 3.11+ (backend), **Node.js 20.19+ or 22.12+** (frontend — Vite 8). Check with `node -v`; on Render set `NODE_VERSION=22.12.0`.
+
 ### Backend
 
 ```bash

@@ -4,6 +4,8 @@ FastAPI backend for the Meteorite Explorer application.
 
 ## Setup
 
+**Python 3.11+** required. Check with `python3 --version`; on Render set `PYTHON_VERSION=3.11.9`.
+
 ```bash
 cd backend
 python -m venv .venv
