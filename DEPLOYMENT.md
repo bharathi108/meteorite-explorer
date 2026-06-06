@@ -101,6 +101,7 @@ Open the frontend URL — globe should load meteorites.
    | Key | Value |
    |-----|--------|
    | `VITE_API_URL` | `https://<your-api>.onrender.com` (no trailing slash) |
+   | `NODE_VERSION` | `22.12.0` (Vite 8 requires Node 20.19+ or 22.12+) |
 
 4. **Redirects/Rewrites** (SPA routing): add a rewrite rule  
    `/*` → `/index.html`  
