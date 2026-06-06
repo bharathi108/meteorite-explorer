@@ -1,0 +1,7 @@
+# See root .gitignore for full list. Backend-specific overrides:
+
+# Local secrets — copy from *.example templates
+.env
+.env.*
+!.env.example
+!.env.*.example

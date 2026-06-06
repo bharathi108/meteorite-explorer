@@ -1,0 +1,48 @@
+# --- OS ---
+.DS_Store
+Thumbs.db
+
+# --- Editors & local IDE ---
+.idea/
+.vscode/
+!.vscode/extensions.json
+.cursor/
+*.swp
+*.swo
+*~
+
+# --- Python (backend) ---
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+coverage/
+
+# Generated DB — rebuilt from meteorite_landings.csv on deploy / ingest
+*.db
+
+# --- Node (frontend) ---
+node_modules/
+dist/
+dist-ssr/
+*.tsbuildinfo
+
+# --- Secrets & local env (commit *.example templates only) ---
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# --- Logs ---
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*

@@ -1,0 +1,17 @@
+# See root .gitignore for full list. Frontend-specific overrides:
+
+# Vite local overrides
+*.local
+.env.local
+.env.*.local
+
+# Logs
+logs
+lerna-debug.log*
+
+# Windows / VS
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
