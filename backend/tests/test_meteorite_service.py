@@ -4,6 +4,7 @@ import pytest
 from pydantic import ValidationError
 
 from app.exceptions import MeteoriteNotFoundError
+from app.models import Meteorite
 from app.schemas import MeteoriteListParams
 from app.services.meteorite_service import (
     get_meteorite_by_id,
@@ -24,6 +25,11 @@ class TestMeteoriteListParams:
     def test_empty_search_becomes_none(self):
         params = MeteoriteListParams(search="   ")
         assert params.search is None
+
+    def test_accepts_antimeridian_lng_range(self):
+        params = MeteoriteListParams(min_lng=170, max_lng=-170)
+        assert params.min_lng == 170
+        assert params.max_lng == -170
 
 
 class TestListMeteorites:
@@ -77,6 +83,53 @@ class TestListMeteorites:
         )
         assert total == 1
         assert items[0].name == "Aachen"
+
+    def test_filter_by_antimeridian_viewport(self, db_session, sample_meteorites):
+        db_session.add_all(
+            [
+                Meteorite(
+                    id=6,
+                    name="Pacific East",
+                    nametype="Valid",
+                    recclass="L6",
+                    mass_grams=100.0,
+                    fall="Found",
+                    year=2000,
+                    latitude=10.0,
+                    longitude=175.0,
+                ),
+                Meteorite(
+                    id=7,
+                    name="Pacific West",
+                    nametype="Valid",
+                    recclass="L6",
+                    mass_grams=100.0,
+                    fall="Found",
+                    year=2000,
+                    latitude=10.0,
+                    longitude=-175.0,
+                ),
+                Meteorite(
+                    id=8,
+                    name="Japan",
+                    nametype="Valid",
+                    recclass="L6",
+                    mass_grams=100.0,
+                    fall="Found",
+                    year=2000,
+                    latitude=35.0,
+                    longitude=139.0,
+                ),
+            ]
+        )
+        db_session.commit()
+
+        items, total = list_meteorites(
+            db_session,
+            MeteoriteListParams(min_lat=-90, max_lat=90, min_lng=170, max_lng=-170),
+        )
+        assert total == 2
+        assert {item.name for item in items} == {"Pacific East", "Pacific West"}
 
     def test_rejects_inverted_lat_range(self):
         with pytest.raises(ValidationError, match="min_lat cannot be greater than max_lat"):

@@ -62,12 +62,8 @@ class MeteoriteListParams(BaseModel):
             and self.min_lat > self.max_lat
         ):
             raise ValueError("min_lat cannot be greater than max_lat")
-        if (
-            self.min_lng is not None
-            and self.max_lng is not None
-            and self.min_lng > self.max_lng
-        ):
-            raise ValueError("min_lng cannot be greater than max_lng")
+        # min_lng > max_lng is valid when the viewport crosses the antimeridian
+        # (e.g. Pacific view); meteorite_service handles that case.
         return self
 
 
