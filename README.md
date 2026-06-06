@@ -14,7 +14,7 @@ Interactive educational app for exploring NASA's Meteorite Landings dataset with
 
 ## First-Time Setup
 
-**Requirements:** Python 3.11+ (backend), **Node.js 22.12.0** (frontend — pinned in `frontend/package.json`). Check with `node -v`; use `frontend/.node-version` with nvm/fnm.
+**Requirements:** Python 3.11+ (backend), **Node.js 22.13.0** (frontend — pinned in `frontend/package.json`).
 
 ### Backend
 
@@ -30,10 +30,19 @@ This creates a virtual environment, installs dependencies, and loads `meteorite_
 
 ### Frontend
 
+Node is pinned to **22.13.0**. If your system Node differs, use [nvm](https://github.com/nvm-sh/nvm) or [fnm](https://github.com/Schniz/fnm) (optional — reads `frontend/.nvmrc`):
+
 ```bash
+# nvm (first time only)
+nvm install 22.13.0
+
 cd frontend
+nvm use          # or: fnm use
+node -v          # should print v22.13.0
 npm install
 ```
+
+`npm install` fails on the wrong Node version (`engine-strict` in `frontend/.npmrc`).
 
 The frontend proxies API requests to the backend during development (see `frontend/vite.config.ts`).
 
@@ -58,6 +67,7 @@ API docs: http://127.0.0.1:8000/docs
 
 ```bash
 cd frontend
+nvm use          # or: fnm use — Node 22.13.0
 npm run dev
 ```
 

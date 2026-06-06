@@ -4,12 +4,19 @@ React + TypeScript frontend with an interactive 3D globe for exploring NASA mete
 
 ## Setup
 
-**Node.js 22.12.0** required — pinned in `package.json` (`engines.node`). With nvm/fnm: `nvm use` or `fnm use` in this directory (reads `.node-version`). Wrong version fails at `npm install` via `engine-strict`.
+Node is pinned to **22.13.0** in `package.json` and `.nvmrc`. If your system Node differs, nvm/fnm is optional:
 
 ```bash
+# nvm — install once if you don't have this version yet
+nvm install 22.13.0
+
 cd frontend
+nvm use          # fnm: fnm use
+node -v          # v22.13.0
 npm install
 ```
+
+Wrong Node version → `npm install` errors (`engine-strict` in `.npmrc`).
 
 ## Development
 
@@ -22,6 +29,7 @@ uvicorn app.main:app --reload
 Then run the frontend:
 
 ```bash
+nvm use          # or: fnm use
 npm run dev
 ```
 

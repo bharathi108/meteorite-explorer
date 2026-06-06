@@ -22,7 +22,7 @@ Browser → Render Static Site (React build)
 
 **Note:** Free-tier web services spin down after inactivity (~30s cold start). The static frontend does not sleep. Backend disk resets on redeploy — ingestion runs again on each build.
 
-**Frontend Node version:** Locked to **22.12.0** in `frontend/package.json`, `frontend/.node-version`, and `NODE_VERSION` in `render.yaml`. On Render, ensure the static site env var is `22.12.0` (not an older pinned value).
+**Frontend Node version:** Locked to **22.13.0** in `frontend/package.json`, `frontend/.node-version`, and `NODE_VERSION` in `render.yaml`. On Render, ensure the static site env var is `22.13.0` (not an older pinned value).
 
 ---
 
@@ -103,7 +103,7 @@ Open the frontend URL — globe should load meteorites.
    | Key | Value |
    |-----|--------|
    | `VITE_API_URL` | `https://<your-api>.onrender.com` (no trailing slash) |
-   | `NODE_VERSION` | `22.12.0` (must match `frontend/package.json`) |
+   | `NODE_VERSION` | `22.13.0` (must match `frontend/package.json`) |
 
 4. **Redirects/Rewrites** (SPA routing): add a rewrite rule  
    `/*` → `/index.html`  
