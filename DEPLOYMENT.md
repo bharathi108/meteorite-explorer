@@ -94,7 +94,7 @@ Open the frontend URL — globe should load meteorites.
    |---------|--------|
    | Root directory | `frontend` |
    | Build command | `npm install && npm run build` |
-   | Publish directory | `dist` |
+   | Publish directory | `dist` (relative to root directory) |
 
 3. Environment:
 

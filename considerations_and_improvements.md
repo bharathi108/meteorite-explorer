@@ -166,6 +166,20 @@ The cache schema (`row_fingerprint`, `prompt_version`, TTL) already supports pre
 - Deploy frontend + backend on Render (Blueprint in `render.yaml`) with env-based config
 - Align [product.md](product.md) copy with 3D globe (still references a flat map in places)
 
+### Docker / containerization
+
+**Intentionally skipped for the take-home.** Render runs the backend via native Python build/start commands and the frontend as a static site — no Dockerfile required.
+
+Docker would still be a reasonable next step for production:
+
+| Benefit | Notes |
+| ------- | ----- |
+| Reproducible local + CI | Same image locally, in tests, and on any host |
+| Portable deploy | Fly.io, ECS, Cloud Run, etc. without platform-specific buildpacks |
+| Compose for full stack | One `docker compose up` for API + optional nginx frontend |
+
+For this MVP, the moving parts are simple (FastAPI + SQLite file + static Vite build), and Render’s blueprint already encodes build/start steps. Adding Docker now would mostly duplicate `render.yaml` and `requirements.txt` without solving a pain point we actually hit. Revisit if we add Postgres, background workers, or multi-service orchestration.
+
 ### Observability
 
 - Structured logging around viewport fetches (bbox, duration, result count)
