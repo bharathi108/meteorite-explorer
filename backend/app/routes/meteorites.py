@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.schemas import MeteoriteBase, MeteoriteListParams, MeteoriteListResponse
-from app.services.meteorite_service import get_meteorite_or_raise, list_meteorites
+from app.services.meteorite_service import get_meteorite_or_raise, list_meteorites, list_recclasses
 
 router = APIRouter(prefix="/meteorites", tags=["meteorites"])
 
@@ -22,6 +22,11 @@ def get_meteorites(
         limit=filters.limit,
         offset=filters.offset,
     )
+
+
+@router.get("/recclasses", response_model=list[str])
+def get_recclasses(db: Session = Depends(get_db)):
+    return list_recclasses(db)
 
 
 @router.get("/{meteorite_id}", response_model=MeteoriteBase)

@@ -10,6 +10,7 @@ from app.services.meteorite_service import (
     get_meteorite_by_id,
     get_meteorite_or_raise,
     list_meteorites,
+    list_recclasses,
 )
 
 
@@ -53,6 +54,10 @@ class TestListMeteorites:
         items, total = list_meteorites(db_session, MeteoriteListParams(recclass="L5"))
         assert total == 1
         assert items[0].name == "Aachen"
+
+    def test_list_recclasses(self, db_session, sample_meteorites):
+        recclasses = list_recclasses(db_session)
+        assert recclasses == ["EH4", "H6", "Iron, IVA", "L5", "L6"]
 
     def test_filter_by_fall(self, db_session, sample_meteorites):
         items, total = list_meteorites(db_session, MeteoriteListParams(fall="Found"))

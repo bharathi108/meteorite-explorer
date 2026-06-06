@@ -76,6 +76,10 @@ export async function fetchMeteorites(
   return request<MeteoriteListResponse>(`/meteorites?${query}`)
 }
 
+export async function fetchRecclasses(): Promise<string[]> {
+  return request<string[]>('/meteorites/recclasses')
+}
+
 export async function fetchMeteorite(id: number): Promise<Meteorite> {
   return request<Meteorite>(`/meteorites/${id}`)
 }

@@ -37,6 +37,14 @@ class TestListMeteoritesApi:
         assert body["total"] == 1
         assert body["items"][0]["name"] == "Aachen"
 
+    def test_list_recclasses(self, client: TestClient):
+        response = client.get("/meteorites/recclasses")
+        assert response.status_code == 200
+        recclasses = response.json()
+        assert recclasses == sorted(recclasses)
+        assert "L5" in recclasses
+        assert "EH4" in recclasses
+
     def test_filter_by_fall(self, client: TestClient):
         response = client.get("/meteorites", params={"fall": "Found"})
         body = response.json()

@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react'
+import { fetchRecclasses } from '../api/meteorites'
 import type { FallFilter, MeteoriteFilters } from '../types/meteorite'
 
 interface FilterPanelProps {
@@ -21,6 +23,26 @@ export default function FilterPanel({
   refreshing,
   viewportScoped,
 }: FilterPanelProps) {
+  const [recclasses, setRecclasses] = useState<string[]>([])
+  const [recclassesLoading, setRecclassesLoading] = useState(true)
+
+  useEffect(() => {
+    let cancelled = false
+    fetchRecclasses()
+      .then((values) => {
+        if (!cancelled) setRecclasses(values)
+      })
+      .catch(() => {
+        if (!cancelled) setRecclasses([])
+      })
+      .finally(() => {
+        if (!cancelled) setRecclassesLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
   const update = (patch: Partial<MeteoriteFilters>) => {
     onChange({ ...filters, ...patch })
   }
@@ -53,13 +75,21 @@ export default function FilterPanel({
 
       <div className="field">
         <label htmlFor="recclass">Classification</label>
-        <input
+        <select
           id="recclass"
-          type="text"
-          placeholder="e.g. L5, H6, EH4"
           value={filters.recclass}
+          disabled={recclassesLoading}
           onChange={(e) => update({ recclass: e.target.value })}
-        />
+        >
+          <option value="">
+            {recclassesLoading ? 'Loading classifications…' : 'Any classification'}
+          </option>
+          {recclasses.map((recclass) => (
+            <option key={recclass} value={recclass}>
+              {recclass}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div className="field">

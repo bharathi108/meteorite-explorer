@@ -79,13 +79,14 @@ pytest
 |--------|------|-------------|
 | GET | `/health` | Health check |
 | GET | `/meteorites` | List meteorites with optional filters |
+| GET | `/meteorites/recclasses` | Distinct classification values (for filter dropdown) |
 | GET | `/meteorites/{id}` | Get a single meteorite |
 | POST | `/meteorites/{id}/explanation` | Get or generate AI explanation (requires `OPENAI_API_KEY` for new summaries) |
 
 ### Filter parameters for `GET /meteorites`
 
 - `search` — meteorite name substring
-- `recclass` — classification filter
+- `recclass` — classification filter (exact match; see `GET /meteorites/recclasses` for options)
 - `fall` — `Fell` or `Found`
 - `min_year`, `max_year` — year range
 - `min_mass`, `max_mass` — mass range in grams

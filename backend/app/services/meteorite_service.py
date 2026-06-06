@@ -16,7 +16,7 @@ def _apply_filters(query, filters: MeteoriteListParams):
         query = query.where(Meteorite.name.ilike(term))
 
     if filters.recclass:
-        query = query.where(Meteorite.recclass.ilike(filters.recclass.strip()))
+        query = query.where(Meteorite.recclass == filters.recclass.strip())
 
     if filters.fall:
         query = query.where(Meteorite.fall == filters.fall)
@@ -88,3 +88,13 @@ def get_meteorite_or_raise(db: Session, meteorite_id: int) -> Meteorite:
     if meteorite is None:
         raise MeteoriteNotFoundError(meteorite_id)
     return meteorite
+
+
+def list_recclasses(db: Session) -> list[str]:
+    query = (
+        select(Meteorite.recclass)
+        .where(Meteorite.recclass.isnot(None), Meteorite.recclass != "")
+        .distinct()
+        .order_by(Meteorite.recclass)
+    )
+    return list(db.scalars(query).all())
