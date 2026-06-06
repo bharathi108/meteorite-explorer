@@ -1,6 +1,6 @@
-# Render Blueprint — deploy from Dashboard → New → Blueprint
-# After deploy, add OPENAI_API_KEY in the service Environment tab.
-# After Vercel deploy, set CORS_ORIGINS to your frontend URL.
+# Render Blueprint — Dashboard → New → Blueprint → connect GitHub repo
+# Set OPENAI_API_KEY on the API service after Apply (see DEPLOYMENT.md).
+# Default URLs assume these service names; update env vars if Render assigns different URLs.
 
 services:
   - type: web
@@ -18,7 +18,21 @@ services:
         value: INFO
       - key: PYTHON_VERSION
         value: 3.11.9
+      - key: CORS_ORIGINS
+        value: https://meteorite-explorer.onrender.com
       - key: OPENAI_API_KEY
         sync: false
-      - key: CORS_ORIGINS
-        sync: false
+
+  - type: web
+    name: meteorite-explorer
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./frontend/dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        value: https://meteorite-explorer-api.onrender.com

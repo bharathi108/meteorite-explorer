@@ -1,9 +1,9 @@
 # Deployment Guide (Take-Home)
 
-For a take-home interview, keep it simple: **Vercel for the frontend**, **Render for the backend + SQLite**. No Kubernetes, no separate DB host.
+Deploy everything on **[Render](https://render.com)** from GitHub: one Blueprint for the FastAPI backend and the React static frontend. SQLite lives on the backend service — no separate database host.
 
 ```text
-Browser → Vercel (static React app)
+Browser → Render Static Site (React build)
               ↓  VITE_API_URL
          Render Web Service (FastAPI)
               ↓
@@ -12,131 +12,145 @@ Browser → Vercel (static React app)
          Built from meteorite_landings.csv on deploy
 ```
 
-## Why this stack?
+## Why Render for both?
 
-| Piece | Service | Why |
-|-------|---------|-----|
-| Frontend | [Vercel](https://vercel.com) | Free, fast CDN, great for Vite/React |
-| Backend | [Render](https://render.com) | Free tier, runs Python/FastAPI with minimal config |
-| Database | SQLite on Render | Already in the project; ~45k rows is fine for a demo |
+| Piece | Render service type | Why |
+|-------|---------------------|-----|
+| Frontend | Static Site | Free CDN, auto-deploy on git push |
+| Backend | Web Service | Runs Python/FastAPI with minimal config |
+| Database | SQLite on backend | ~45k rows; rebuilt from CSV on each deploy |
 
-You do **not** need a managed Postgres instance for this app. SQLite ships with the backend and is rebuilt from the CSV on each deploy.
-
-**Tradeoff:** On Render’s free tier, the filesystem is reset when you redeploy — the build step re-runs ingestion, which is acceptable for a take-home.
+**Tradeoff:** Free-tier web services spin down after inactivity (~30s cold start). The static frontend does not sleep. Backend disk resets on redeploy — ingestion runs again on each build.
 
 ---
 
 ## Prerequisites
 
-- GitHub repo with this project pushed
-- [Render](https://render.com) account
-- [Vercel](https://vercel.com) account
+- Code pushed to [GitHub](https://github.com/bharathi108/meteorite-explorer)
+- [Render](https://render.com) account (sign in with GitHub)
 - OpenAI API key (for AI summaries)
 
 ---
 
-## 1. Deploy the backend (Render)
+## 1. Deploy with Blueprint (recommended)
 
-### Option A — Blueprint (easiest)
+1. In Render: **New + → Blueprint**.
+2. Connect **`bharathi108/meteorite-explorer`** (or your fork).
+3. Render reads [`render.yaml`](render.yaml) and creates two services:
+   - **`meteorite-explorer-api`** — Python web service (`backend/`)
+   - **`meteorite-explorer`** — static site (`frontend/`)
+4. When prompted, set **`OPENAI_API_KEY`** on the API service (secret).
+5. Click **Apply** and wait for both deploys (API build includes CSV ingestion).
 
-1. Push this repo to GitHub.
-2. In Render: **New → Blueprint** → connect the repo.
-3. Render reads [`render.yaml`](render.yaml) at the repo root.
-4. In the Render dashboard, add secret env var **`OPENAI_API_KEY`** to the web service.
-5. After deploy, note the URL (e.g. `https://meteorite-explorer-api.onrender.com`).
+**Default URLs** (if Render accepts these service names):
 
-### Option B — Manual web service
+| Service | URL |
+|---------|-----|
+| Frontend | `https://meteorite-explorer.onrender.com` |
+| API | `https://meteorite-explorer-api.onrender.com` |
 
-1. **New → Web Service** → connect GitHub repo.
+The blueprint pre-wires `VITE_API_URL` and `CORS_ORIGINS` for those names. If Render assigns different URLs, update env vars in the dashboard (see [§3 Wire up the URLs](#3-wire-up-the-urls)).
+
+**Verify API:**
+
+```bash
+curl https://meteorite-explorer-api.onrender.com/health
+curl "https://meteorite-explorer-api.onrender.com/meteorites?limit=1"
+```
+
+Open the frontend URL — globe should load meteorites.
+
+---
+
+## 2. Manual setup (alternative)
+
+### Backend — Web Service
+
+1. **New + → Web Service** → connect repo.
 2. Settings:
-   - **Root directory:** `backend`
-   - **Runtime:** Python 3
-   - **Build command:**
-     ```bash
-     pip install -r requirements.txt && python -m app.scripts.ingest_meteorites
-     ```
-   - **Start command:**
-     ```bash
-     uvicorn app.main:app --host 0.0.0.0 --port $PORT
-     ```
-3. **Environment variables:**
+
+   | Setting | Value |
+   |---------|--------|
+   | Root directory | `backend` |
+   | Runtime | Python 3 |
+   | Build command | `pip install -r requirements.txt && python -m app.scripts.ingest_meteorites` |
+   | Start command | `uvicorn app.main:app --host 0.0.0.0 --port $PORT` |
+
+3. Environment:
 
    | Key | Value |
    |-----|--------|
    | `APP_ENV` | `production` |
-   | `OPENAI_API_KEY` | your key (secret) |
-   | `CORS_ORIGINS` | `https://your-app.vercel.app` (set after frontend deploy) |
+   | `OPENAI_API_KEY` | your key |
+   | `CORS_ORIGINS` | frontend URL (see below) |
    | `LOG_LEVEL` | `INFO` |
 
-4. Deploy. Verify: `GET https://<your-api>/health` → `{"status":"ok"}`  
-   And: `GET https://<your-api>/meteorites?limit=1` returns data.
+### Frontend — Static Site
 
-**Note:** Free-tier Render services spin down after inactivity; first request may take ~30s.
-
----
-
-## 2. Deploy the frontend (Vercel)
-
-1. **New Project** → import the same GitHub repo.
+1. **New + → Static Site** → same repo.
 2. Settings:
-   - **Root directory:** `frontend`
-   - **Framework preset:** Vite
-   - **Build command:** `npm run build`
-   - **Output directory:** `dist`
-3. **Environment variable:**
+
+   | Setting | Value |
+   |---------|--------|
+   | Root directory | `frontend` |
+   | Build command | `npm install && npm run build` |
+   | Publish directory | `dist` |
+
+3. Environment:
 
    | Key | Value |
    |-----|--------|
-   | `VITE_API_URL` | `https://<your-render-api-url>` (no trailing slash) |
+   | `VITE_API_URL` | `https://<your-api>.onrender.com` (no trailing slash) |
 
-4. Deploy. Vercel gives you e.g. `https://meteorite-explorer.vercel.app`.
-
-5. **Update Render CORS:** Go back to Render → backend service → Environment → set  
-   `CORS_ORIGINS=https://meteorite-explorer.vercel.app`  
-   (use your actual Vercel URL; add preview URL too if you want PR previews to work).
-
-6. Redeploy backend (or wait for env reload).
+4. **Redirects/Rewrites** (SPA routing): add a rewrite rule  
+   `/*` → `/index.html`  
+   (Blueprint does this via `routes` in `render.yaml`.)
 
 ---
 
-## 3. Database — what actually happens
+## 3. Wire up the URLs
 
-There is no separate “DB deploy” step:
+The browser calls the API directly in production (no Vite proxy).
 
-1. `meteorite_landings.csv` lives in `backend/` (committed to git).
-2. Render **build** runs `python -m app.scripts.ingest_meteorites` → creates `meteorites.db`.
-3. FastAPI reads SQLite via `DATABASE_URL` (defaults to `backend/meteorites.db`).
-4. AI explanation cache is also stored in the same SQLite file.
+| Where | Variable | Value |
+|-------|----------|--------|
+| Static site → **Environment** | `VITE_API_URL` | `https://meteorite-explorer-api.onrender.com` |
+| Web service → **Environment** | `CORS_ORIGINS` | `https://meteorite-explorer.onrender.com` |
 
-Optional: override `DATABASE_URL` if you ever mount a persistent disk (Fly.io volume, Render paid disk). Not needed for the take-home.
+- **No trailing slashes.**
+- **No `/api` prefix** — backend routes are `/meteorites`, `/health`, etc.
+- After changing `VITE_API_URL`, **redeploy the static site** (value is baked in at build time).
+- After changing `CORS_ORIGINS`, redeploy or restart the API service.
 
 ---
 
-## 4. Checklist before sharing the link
+## 4. Database — what actually happens
+
+No separate DB deploy:
+
+1. `meteorite_landings.csv` is in `backend/` (committed).
+2. API **build** runs `python -m app.scripts.ingest_meteorites` → `meteorites.db`.
+3. AI explanation cache lives in the same SQLite file.
+
+---
+
+## 5. Auto-deploy
+
+Both services redeploy on push to `main` by default. Future changes: `git push` and wait for Render builds.
+
+---
+
+## 6. Checklist before sharing the link
 
 - [ ] `GET /health` returns OK on production API
-- [ ] Globe loads meteorites (not empty / CORS errors in browser console)
+- [ ] Frontend loads globe with meteorites (no CORS errors in console)
 - [ ] Click a meteorite → details + AI insight work
-- [ ] README or submission email includes **live frontend URL** and **API URL**
-- [ ] `.env.development` / `.env.production` with secrets are **not** committed
+- [ ] Submission includes **frontend URL** and **API URL**
+- [ ] `.env.development` / secrets are not committed
 
 ---
 
-## 5. Alternatives (if you prefer)
-
-| Stack | When to use |
-|-------|-------------|
-| **Railway** (backend + frontend) | One dashboard, similar to Render; good monorepo support |
-| **Fly.io** + volume | If you want SQLite to survive redeploys without re-ingesting |
-| **Render static site** for frontend | Skip Vercel; works, but Vercel is smoother for Vite |
-
-Avoid for a take-home: AWS ECS/EKS, self-managed Postgres, Docker Compose on a VPS (unless the job explicitly asks for it).
-
----
-
-## 6. Local production smoke test
-
-Before deploying, you can mimic production locally:
+## 7. Local production smoke test
 
 ```bash
 # Terminal 1 — backend

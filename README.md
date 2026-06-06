@@ -65,9 +65,9 @@ App: http://localhost:5173
 
 ## Deploy (take-home)
 
-**Recommended:** [Vercel](https://vercel.com) (frontend) + [Render](https://render.com) (backend + SQLite).
+**Recommended:** [Render](https://render.com) for both frontend (static site) and backend (web service + SQLite).
 
-See **[DEPLOYMENT.md](DEPLOYMENT.md)** for step-by-step instructions, env vars, and a pre-deploy checklist.
+See **[DEPLOYMENT.md](DEPLOYMENT.md)** for Blueprint setup, env vars, and a pre-deploy checklist.
 
 ---
 

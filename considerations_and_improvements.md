@@ -163,7 +163,7 @@ The cache schema (`row_fingerprint`, `prompt_version`, TTL) already supports pre
 ### Product & deployment
 
 - Wire up **OpenAI** in production — set `OPENAI_API_KEY` (see `backend/.env.example`)
-- Deploy frontend (e.g. Vercel) + backend (e.g. Render/Fly) with env-based config
+- Deploy frontend + backend on Render (Blueprint in `render.yaml`) with env-based config
 - Align [product.md](product.md) copy with 3D globe (still references a flat map in places)
 
 ### Observability

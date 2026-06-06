@@ -33,7 +33,7 @@ Vite loads env files by mode — no manual exports needed for local dev.
 
 | File | Mode | Purpose |
 |------|------|---------|
-| `.env.development` | `npm run dev` | Dev API proxy path (committed) |
+| `.env.development` | `npm run dev` | Dev API proxy path (gitignored) |
 | `.env.production` | `npm run build` | Deployed API URL (gitignored; copy from `.env.production.example`) |
 | `.env.local` | both | Optional local overrides (gitignored) |
 
@@ -41,11 +41,10 @@ Vite loads env files by mode — no manual exports needed for local dev.
 |----------|-------------|-------------|
 | `VITE_API_URL` | `/api` | Backend API base URL |
 
-Production build:
+Production build (local) or set `VITE_API_URL` in Render static site env for deploy:
 
 ```bash
 cp .env.production.example .env.production
-# set VITE_API_URL to your deployed API
 npm run build
 ```
 

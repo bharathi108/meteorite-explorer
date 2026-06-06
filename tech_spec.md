@@ -563,12 +563,12 @@ Allow users to save:
 Potential deployment architecture:
 
 ```text
-Frontend: Vercel
-Backend: Render
+Frontend: Render (static site)
+Backend: Render (web service)
 Database: SQLite
 
 Future:
-Frontend: Vercel
+Frontend: Render / Vercel
 Backend: Fly.io / AWS
 Database: Postgres + PostGIS
 ```
