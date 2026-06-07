@@ -75,7 +75,9 @@ App: http://localhost:5173
 
 ## Deploy (take-home)
 
-**Recommended:** [Render](https://render.com) for both frontend (static site) and backend (web service + SQLite).
+[Render](https://render.com) for both frontend (static site) and backend (web service + SQLite).
+
+Deployed on: https://meteorite-explorer.onrender.com/
 
 See **[DEPLOYMENT.md](DEPLOYMENT.md)** for Blueprint setup, env vars, and a pre-deploy checklist.
 
