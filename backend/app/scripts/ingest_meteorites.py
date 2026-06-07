@@ -3,20 +3,16 @@
 from __future__ import annotations
 
 import argparse
-import sys
 from pathlib import Path
-
 from typing import Optional
 
 import pandas as pd
 
+from app.database import SessionLocal, init_db
+from app.models import Meteorite
+
 BACKEND_DIR = Path(__file__).resolve().parent.parent.parent
 DEFAULT_CSV = BACKEND_DIR / "meteorite_landings.csv"
-
-sys.path.insert(0, str(BACKEND_DIR))
-
-from app.database import SessionLocal, init_db  # noqa: E402
-from app.models import Meteorite  # noqa: E402
 
 
 def _parse_year(value) -> Optional[int]:

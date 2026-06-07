@@ -26,11 +26,31 @@ export default function MeteoriteGlobe({
   onSelect,
   onViewportChange,
 }: MeteoriteGlobeProps) {
+  const containerRef = useRef<HTMLDivElement>(null)
   const globeRef = useRef<GlobeMethods | undefined>(undefined)
   const onViewportChangeRef = useRef(onViewportChange)
   const onSelectRef = useRef(onSelect)
   const [globeReady, setGlobeReady] = useState(false)
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
   const lastSelectedIdRef = useRef<number | null>(null)
+
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+
+    const updateSize = () => {
+      const { width, height } = container.getBoundingClientRect()
+      setDimensions({
+        width: Math.round(width),
+        height: Math.round(height),
+      })
+    }
+
+    updateSize()
+    const observer = new ResizeObserver(updateSize)
+    observer.observe(container)
+    return () => observer.disconnect()
+  }, [])
 
   useEffect(() => {
     onViewportChangeRef.current = onViewportChange
@@ -134,27 +154,31 @@ export default function MeteoriteGlobe({
   }, [])
 
   return (
-    <div className="globe-container">
-      <GlobeGL
-        ref={globeRef}
-        onGlobeReady={handleGlobeReady}
-        globeImageUrl={EARTH_TEXTURE}
-        bumpImageUrl={BUMP_TEXTURE}
-        backgroundImageUrl="//unpkg.com/three-globe/example/img/night-sky.png"
-        pointsData={renderPoints}
-        pointsMerge={false}
-        pointResolution={8}
-        pointLat="lat"
-        pointLng="lng"
-        pointAltitude="altitude"
-        pointRadius="size"
-        pointColor={pointColor}
-        pointLabel={pointLabel}
-        onPointClick={handlePointClick}
-        onPointHover={handlePointHover}
-        atmosphereColor="#3a7bd5"
-        atmosphereAltitude={0.15}
-      />
+    <div className="globe-container" ref={containerRef}>
+      {dimensions.width > 0 && dimensions.height > 0 && (
+        <GlobeGL
+          ref={globeRef}
+          width={dimensions.width}
+          height={dimensions.height}
+          onGlobeReady={handleGlobeReady}
+          globeImageUrl={EARTH_TEXTURE}
+          bumpImageUrl={BUMP_TEXTURE}
+          backgroundImageUrl="//unpkg.com/three-globe/example/img/night-sky.png"
+          pointsData={renderPoints}
+          pointsMerge={false}
+          pointResolution={8}
+          pointLat="lat"
+          pointLng="lng"
+          pointAltitude="altitude"
+          pointRadius="size"
+          pointColor={pointColor}
+          pointLabel={pointLabel}
+          onPointClick={handlePointClick}
+          onPointHover={handlePointHover}
+          atmosphereColor="#3a7bd5"
+          atmosphereAltitude={0.15}
+        />
+      )}
     </div>
   )
 }
