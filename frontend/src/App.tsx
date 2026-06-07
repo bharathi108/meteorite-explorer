@@ -16,6 +16,7 @@ import {
 function useDebouncedValue<T>(value: T, delayMs: number): T {
   const [debounced, setDebounced] = useState(value)
 
+  // Delay updates until value stops changing (filters / viewport).
   useEffect(() => {
     const timer = window.setTimeout(() => setDebounced(value), delayMs)
     return () => window.clearTimeout(timer)
@@ -47,6 +48,7 @@ export default function App() {
   const [selected, setSelected] = useState<Meteorite | null>(null)
   const hasLoadedOnce = useRef(false)
 
+  // Fetch meteorites when debounced filters or viewport bounds change.
   useEffect(() => {
     let cancelled = false
     if (!hasLoadedOnce.current) setLoading(true)

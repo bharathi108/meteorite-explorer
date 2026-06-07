@@ -34,6 +34,7 @@ export default function MeteoriteGlobe({
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
   const lastSelectedIdRef = useRef<number | null>(null)
 
+  // Measure panel size for GlobeGL canvas; re-run on container resize.
   useEffect(() => {
     const container = containerRef.current
     if (!container) return
@@ -52,6 +53,7 @@ export default function MeteoriteGlobe({
     return () => observer.disconnect()
   }, [])
 
+  // Keep latest parent callbacks for stable globe event handlers.
   useEffect(() => {
     onViewportChangeRef.current = onViewportChange
     onSelectRef.current = onSelect
@@ -96,6 +98,7 @@ export default function MeteoriteGlobe({
     setGlobeReady(true)
   }, [])
 
+  // After globe loads: set initial camera and report viewport when user stops panning.
   useEffect(() => {
     if (!globeReady) return
     const globe = globeRef.current
@@ -113,6 +116,7 @@ export default function MeteoriteGlobe({
     }
   }, [globeReady, emitViewport])
 
+  // Fly camera to newly selected meteorite (once per selection).
   useEffect(() => {
     if (selectedId == null) {
       lastSelectedIdRef.current = null
