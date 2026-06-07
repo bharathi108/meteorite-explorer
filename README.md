@@ -78,6 +78,7 @@ App: http://localhost:5173
 [Render](https://render.com) for both frontend (static site) and backend (web service + SQLite).
 
 Deployed on: https://meteorite-explorer.onrender.com/
+API Docs: https://meteorite-explorer-api.onrender.com/docs 
 
 See **[DEPLOYMENT.md](DEPLOYMENT.md)** for Blueprint setup, env vars, and a pre-deploy checklist.
 
