@@ -119,6 +119,20 @@ Significance thresholds for refetch are a blunt instrument: small pans may not u
 
 Even with caching, the first explanation for a meteorite will incur model latency and cost. Long term, sync request/response may not scale if explanations become popular or prompts grow richer.
 
+**Current request lifecycle (MVP):**
+
+The UI uses a **synchronous blocking POST** — not long polling, not streaming. When a meteorite is selected, `useMeteoriteExplanation` in `GlobeInsightCard.tsx` calls `POST /meteorites/{id}/explanation` and shows “Generating summary…” until the full JSON response arrives.
+
+| Layer | Timeout today | Notes |
+| ----- | ------------- | ----- |
+| **Frontend `fetch`** | None | No client timeout; no `AbortController` — switching meteorites ignores stale *state updates* but does not cancel the in-flight HTTP request |
+| **FastAPI / Uvicorn** | None | Handler blocks until OpenAI returns or errors |
+| **OpenAI SDK (default)** | 5s connect, **600s read** | Not configured in code — this is a library ceiling, not expected latency |
+
+**In practice:** cache hits are near-instant; uncached generations are usually a few seconds (longer on Render cold start). A multi-minute wait would mean OpenAI or the network is stalling in an unusual way — possible with current defaults, but not normal UX.
+
+This is acceptable for the take-home but would be tightened before production (see **AI: async jobs & pre-generation** below).
+
 ### SQLite & spatial queries
 
 Bbox filtering uses simple lat/lng comparisons on indexed columns — sufficient for the MVP. Complex spatial analytics (radius search, clustering, heatmaps) would push toward PostGIS or similar.
@@ -141,9 +155,12 @@ Distinct from AI explanation caching — this targets the high-churn globe fetch
 
 | Improvement | Benefit |
 | ----------- | ------- |
+| **Shorter timeouts** | Cap OpenAI read timeout (e.g. 30–60s) and add a matching frontend `fetch` timeout so users get a clear error instead of an indefinite spinner |
+| **Abort stale requests** | Wire `AbortController` in `useMeteoriteExplanation` so changing selection cancels the previous POST |
 | **Async job queue** | `POST /explanation` enqueues work; client polls or receives a webhook/SSE when ready — avoids long HTTP hangs |
 | **Pre-generate summaries** | Batch job over top-N or all meteorites after ingestion; most selections become instant cache hits |
 | **Streaming** | Stream tokens to the UI for perceived faster response on cache miss |
+| **Progressive UX** | “Still generating…” after N seconds, retry button, or skeleton while facts in the sidebar load immediately |
 
 The cache schema (`row_fingerprint`, `prompt_version`, TTL) already supports pre-generation — workers would call the same store path as the live API.
 
